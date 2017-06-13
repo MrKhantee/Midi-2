@@ -25,6 +25,7 @@ public class BeatBox {
     private void buildGUI() throws Exception {
         theFrame = new JFrame("Cyber BeatBox");
         theFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         BorderLayout layout = new BorderLayout();
         JPanel background = new JPanel(layout);
         background.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -32,34 +33,42 @@ public class BeatBox {
         checkBoxList = new ArrayList<>();
         Box buttonBox = new Box(BoxLayout.Y_AXIS);
 
-        JButton start = new JButton("Start");
+        JButton start = new JButton("Начать");
+        start.setMaximumSize(new Dimension(200,30));
         start.addActionListener(actionEvent -> buildTrackAndStart());
         buttonBox.add(start);
 
-        JButton stop = new JButton("Stop");
+        JButton stop = new JButton("Остановить");
+        stop.setMaximumSize(new Dimension(200,30));
         stop.addActionListener(actionEvent -> sequencer.stop());
+        System.out.println(stop.getPreferredSize().getWidth());
         buttonBox.add(stop);
 
-        JButton upTempo = new JButton("Tempo Up");
+        JButton upTempo = new JButton("Увеличить темп");
+        upTempo.setMaximumSize(new Dimension(200,30));
         upTempo.addActionListener(actionEvent -> {
             float tempoFactor = sequencer.getTempoFactor();
             sequencer.setTempoFactor((float) (tempoFactor * 1.03));
         });
         buttonBox.add(upTempo);
 
-        JButton downTempo = new JButton("Tempo Down");
+        JButton downTempo = new JButton("Замедлить темп");
+        downTempo.setMaximumSize(new Dimension(200,30));
         downTempo.addActionListener(actionEvent -> {
             float tempoFactor = sequencer.getTempoFactor();
             sequencer.setTempoFactor((float) (tempoFactor * 0.97));
         });
         buttonBox.add(downTempo);
 
-        JButton serializ = new JButton("Serializ");
-        serializ.addActionListener(actionEvent -> saveState());
-        buttonBox.add(serializ);
+        JButton serialize = new JButton("Сохранить сэмпл");
+        serialize.setMaximumSize(new Dimension(200,30));
+        serialize.addActionListener(actionEvent -> saveSample());
+        buttonBox.add(serialize);
 
-        JButton readSer = new JButton("restore");
-        readSer.addActionListener(actionEvent -> loadState());
+        JButton readSer = new JButton("Загрузить сэмпл");
+        readSer.setMaximumSize(new Dimension(200,30));
+        readSer.addActionListener(actionEvent -> loadSample());
+        System.out.println(readSer.getPreferredSize().getWidth());
         buttonBox.add(readSer);
 
         Box nameBox = new Box(BoxLayout.Y_AXIS);
@@ -106,14 +115,11 @@ public class BeatBox {
 
     private void buildTrackAndStart() {
         int[] trackList;
-
         sequence.deleteTrack(track);
         track = sequence.createTrack();
-
         for (int i=0; i< 16; i++) {
             trackList = new int[16];
             int key = instruments[i];
-
             for (int j=0; j < 16; j++) {
                 JCheckBox jc = checkBoxList.get(j + (16*i));
                 if (jc.isSelected())
@@ -124,7 +130,6 @@ public class BeatBox {
             makeTracks(trackList);
             track.add(makeEvent(176,1,127,0,16));
         }
-
         track.add(makeEvent(192,9,1,0,15));
         try {
             sequencer.setSequence(sequence);
@@ -140,7 +145,7 @@ public class BeatBox {
         for (int i=0; i < 16; i++) {
             int key = list[i];
             if (key != 0) {
-                track.add(makeEvent(144,9,key,100,i));
+                track.add(makeEvent(144,9,key,100, i));
                 track.add(makeEvent(128,9,key,100,i+1));
             }
         }
@@ -158,7 +163,7 @@ public class BeatBox {
         return event;
     }
 
-    private void saveState() {
+    private void saveSample() {
         boolean[] checkboxState = new boolean[256];
         for (int i=0; i< 256; i++) {
             JCheckBox check = checkBoxList.get(i);
@@ -177,7 +182,7 @@ public class BeatBox {
         }
     }
 
-    private void loadState() {
+    private void loadSample() {
         boolean[] checkboxState = null;
         try {
             JFileChooser fileChooser = new JFileChooser();
@@ -199,6 +204,4 @@ public class BeatBox {
         sequencer.stop();
         buildTrackAndStart();
     }
-
-
 }
