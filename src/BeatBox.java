@@ -25,7 +25,10 @@ public class BeatBox {
     private void buildGUI() throws Exception {
         theFrame = new JFrame("Cyber BeatBox");
         theFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        for (UIManager.LookAndFeelInfo lf:UIManager.getInstalledLookAndFeels()) {
+            if (lf.getName().equals("GTK+"))
+                UIManager.setLookAndFeel(lf.getClassName());
+        }
         BorderLayout layout = new BorderLayout();
         JPanel background = new JPanel(layout);
         background.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -41,7 +44,6 @@ public class BeatBox {
         JButton stop = new JButton("Остановить");
         stop.setMaximumSize(new Dimension(200,30));
         stop.addActionListener(actionEvent -> sequencer.stop());
-        System.out.println(stop.getPreferredSize().getWidth());
         buttonBox.add(stop);
 
         JButton upTempo = new JButton("Увеличить темп");
@@ -68,7 +70,6 @@ public class BeatBox {
         JButton readSer = new JButton("Загрузить сэмпл");
         readSer.setMaximumSize(new Dimension(200,30));
         readSer.addActionListener(actionEvent -> loadSample());
-        System.out.println(readSer.getPreferredSize().getWidth());
         buttonBox.add(readSer);
 
         Box nameBox = new Box(BoxLayout.Y_AXIS);
